@@ -1,0 +1,31 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_ARRAY_SIZE 1000
+int main(void) {
+ // your code here! 
+    int array[MAX_ARRAY_SIZE];
+    int n = 1;
+    scanf("%d", &array[0]);
+    int end = getchar();
+    while(end != EOF) {
+        if(array[0] == 0) {
+            printf("First Half: \n");
+            return 0;
+        }
+        scanf("%d", &array[n]);
+        if(array[n] == 0) {
+            break;
+        }
+        n++;
+        end = getchar();
+    }
+    printf("First Half: ");
+    int i = 0;
+    while (i < (n+1)/2) {
+        printf("%d ", array[i]);
+        i++;
+    }
+    printf("\n");
+    return 0;
+}

@@ -1,0 +1,26 @@
+#include <stdio.h> 
+
+int main()
+{
+    int i = 0, j;
+    char ch[100];
+    int c;
+ c = getchar();
+ while (c != EOF) {
+     j = i;
+  while (c != '\n') {
+      if (c != 'a' && c != 'e' && c != 'i' && c != 'o' && c != 'u') {
+    ch[i++] = c;
+   }
+   c = getchar();
+  }
+  ch[i] = '\0';
+  while (ch[j] != '\0') {
+   putchar(ch[j++]);
+  }
+  printf("\n");
+  c = getchar();
+ }
+ 
+    return 0;
+}

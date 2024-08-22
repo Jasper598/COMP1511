@@ -1,0 +1,31 @@
+#include <stdio.h>
+int main(void) {
+    int x;
+    printf("Please enter an integer:");
+    scanf("%d",&x);
+    printf("You entered ");
+    if(x==1){
+      printf("one.");
+      }
+     if(x==2){
+      printf("two.");
+      }
+     if(x==3){
+      printf("three.");
+      }
+      if(x==4){
+      printf("four.");
+      }
+      if(x==5){
+      printf("five.");
+      }
+      if(x<1){
+      printf("a number less than one.");
+      }
+      if(x>=6){
+      printf("a number greater than five");
+      }
+      printf("\n");
+      return 0;
+}
+      

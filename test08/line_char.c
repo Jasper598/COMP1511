@@ -1,0 +1,21 @@
+#include <stdio.h>
+
+#define max_length 1000
+
+int main(void) {
+    int array[max_length];
+    int c = getchar();
+    int i = 0;
+    while (c != '\n') {
+        array[i] = c;
+        c = getchar();       
+        i++;
+    }
+    array[i] = '\0';
+    int n = 0;
+    scanf("%d",&n);
+    printf("The character in position %d is '%c'\n", n, array[n]);
+    return 0;
+}
+    
+    

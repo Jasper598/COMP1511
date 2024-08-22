@@ -1,0 +1,9 @@
+#include <stdio.h>
+
+int main(void){
+   
+   printf("It is very important to program with good style");
+   printf("\n");         
+   
+   return 0;
+  } 

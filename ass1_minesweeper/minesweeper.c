@@ -1,0 +1,362 @@
+// Assignment 1 20T1 COMP1511: Minesweeper
+// minesweeper.c
+//
+// This program was written by YoujiaCao(z5382307)
+// on 2021/10/12
+//
+// Version 1.0.0 (2020-03-08): Assignment released.
+// Version 1.0.1 (2020-03-08): Fix punctuation in comment.
+// Version 1.0.2 (2020-03-08): Fix second line of header comment to say minesweeper.c
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Possible square states.
+#define VISIBLE_SAFE    0
+#define HIDDEN_SAFE     1
+#define HIDDEN_MINE     2
+
+// The size of the starting grid.
+#define SIZE 8
+
+// The possible command codes.
+#define DETECT_ROW              1
+#define DETECT_COL              2
+#define DETECT_SQUARE           3
+#define REVEAL_SQUARE           4
+#define GAMEPLAY_MODE           5
+#define DEBUG_MODE              6
+#define REVEAL_RADIAL           7
+
+// Add any extra #defines here.
+
+void initialise_field(int minefield[SIZE][SIZE]);
+void print_debug_minefield(int minefield[SIZE][SIZE]);
+
+// Place your function prototyes here.
+void detect_row(int minefield[SIZE][SIZE]);
+void detect_col(int minefield[SIZE][SIZE]);
+void detect_square(int minefield[SIZE][SIZE]);
+void reveal_square(int minefield[SIZE][SIZE],int row,int column);
+void gameplay_mode(int map[SIZE][SIZE], int way[8][2],int mode);
+
+int count(int map[SIZE][SIZE], int way[8][2], int x, int y){
+    int i=0,cnt=0;
+    while(i<8){
+        int x1=x+way[i][0],y1=y+way[i][1];
+        if(x1<0||y1<0||x1>=SIZE||y1>=SIZE){i++;continue;}
+        cnt += map[x1][y1] == HIDDEN_MINE;
+        i++;
+    }
+    return cnt;
+}
+
+
+int main(void) {
+    int minefield[SIZE+1][SIZE];
+    int way[8][2]={{0,1},{0,-1},{1,0},{-1,0},{1,1},{-1,-1},{1,-1},{-1,1}};
+    initialise_field(minefield);
+    printf("Welcome to minesweeper!\n");
+    printf("How many mines? ");
+    
+// TODO: Scan in the number of pairs of mines.
+
+    int mines;
+    scanf("%d",&mines);
+    
+    printf("Enter pairs:\n");
+
+// TODO: Scan in the pairs of mines and place them on the grid.
+ 
+    int i=0;
+    while (i < mines) {
+        int num1,num2;
+        scanf("%d %d",&num1,&num2);
+        if (num1 < 0 || num1 > 7) {
+            num1 = 0, num2 = 0;
+        }
+        else if ( num2 < 0 || num2 >7) {
+            num1 = 0,num2 = 0;
+        }
+        else {
+             minefield[num1][num2] = HIDDEN_MINE;
+        }       
+        i++;
+    }     
+
+
+    
+
+    printf("Game Started\n");
+    int detect = 0;
+    int hint = 3;
+    int ls1,ls2; 
+    int gm = 0,first = 1;   
+    print_debug_minefield(minefield);
+    // TODO: Scan in commands to play the game until the game ends.
+    // A game ends when the player wins, loses, or enters EOF (Ctrl+D).
+    // You should display the minefield after each command has been processed.
+    while(scanf("%d",&detect) != EOF){
+       
+        if (detect == DETECT_ROW&&hint>0) {
+            hint--;
+            detect_row(minefield);
+        }
+        else if (detect == DETECT_COL&&hint>0) {
+            hint--;
+            detect_col(minefield);
+        }
+        else if (detect == DETECT_SQUARE&&hint>0) {
+            hint--;
+            detect_square(minefield);
+        }
+        else if (detect == REVEAL_SQUARE||detect ==REVEAL_RADIAL) {
+            int row,column;          
+            scanf("%d %d",&row,&column);
+            if (minefield[row][column]==2) {
+                if (first) {
+                    while (minefield[row][column]==HIDDEN_MINE) {
+                        i=SIZE;
+                        while (i) {
+                            int j=0;
+                            while (j<SIZE) {
+                                minefield[i][j]=minefield[i-1][j];
+                                j++;
+                            }
+                            i--;
+                        }
+                        i=0;
+                        while(i<SIZE){
+                            minefield[0][i]=minefield[SIZE][i];
+                            i++;
+                        }
+                   }
+                }
+                else{
+                    printf("Game over\n");
+                    if (gm) {gameplay_mode(minefield,way,1);}
+                    else {print_debug_minefield(minefield);}
+                    return 0;
+                }
+          }       
+          reveal_square(minefield,row,column);
+          int check_row = 0; 
+          int check = 0;          
+          while (check_row < SIZE) {
+              int check_column = 0;
+              while (check_column<SIZE) { 
+                  if (minefield[check_row][check_column] == 1) {
+                      check++;
+                  }
+                  check_column++;
+              }
+              check_row++;
+          }
+          if (check ==0) {
+              printf("Game Won!\n");
+              if(gm)gameplay_mode(minefield,way,0);else print_debug_minefield(minefield);
+              return 0;
+          }
+          first=0;
+          if (detect == 7){ 
+              i=0;
+              while(i<8){
+                 int j=0;
+                 while(1){
+                     int x=row + way[i][0]*j,y=column+way[i][1]*j;
+                     if(x<0||y<0||x>=SIZE||y>=SIZE){break;}
+                     if(count(minefield,way,x,y)==0)minefield[x][y]=VISIBLE_SAFE;
+                     else break;
+                     j++;
+                 }
+                 i++;
+              }
+          }
+                                
+        }
+        else if (detect==5) {
+            printf("Gameplay mode activated\n");
+            gm=1;
+        }  
+        else if (detect==6) {
+            printf("Debug mode activated\n");
+            gm=0;
+        }        
+        else {
+            if(detect==1||detect==2){scanf("%d",&ls1);}
+            if(detect==3){scanf("%d%d",&ls1,&ls2);}
+            printf("Help already used\n");
+        }        
+        if(gm)gameplay_mode(minefield,way,0);else print_debug_minefield(minefield);
+    }
+
+    return 0;
+}
+
+//command is specified by the integer1
+
+void detect_row(int minefield[SIZE][SIZE]){
+    int i=0;
+    int c_r;
+    int n=0;  
+    scanf("%d" , &c_r);         
+    while (i < SIZE) {
+        if (minefield[i][c_r-1] == 2) {
+            n++;
+            i++;
+        }
+        else{
+            i++;
+        }               
+    }
+    printf("There are %d mine(s) in row %d\n",n,c_r);
+}
+
+//command is specified by the integer 2
+void detect_col(int minefield[SIZE][SIZE]){
+
+    int i = 0;
+    int c_r;
+    int n=0;
+    scanf("%d" , &c_r);    
+    while (i < SIZE){
+        if (minefield[c_r-1][i] == 2) {
+            n++;
+            i++;
+        }
+        else {
+            i++;
+        }
+    }
+    printf("There are %d mine(s) in column %d\n",n,c_r);
+}
+
+//command is specified by the integer 3.
+void detect_square(int minefield[SIZE][SIZE]){
+     int column,row,size;
+     scanf("%d %d %d",&row,&column,&size);
+     int i=0;
+     int n = 0;         
+     while (i < size){
+         int j=0; 
+         while(j<size){
+             if(minefield[row-(size-1)/2+j][column-(size-1)/2+i]==2){
+                 n++;
+              }
+              j++;
+         }
+         i++;
+      }
+      printf("There are %d mine(s) in the square centered at row %d, column %d of size %d\n", n, row, column, size);
+}  
+ 
+//command is specified by the integer 4.
+ 
+void reveal_square(int minefield[SIZE][SIZE],int row,int column){
+    int i=0;
+    int n=0;
+    while (i <3) {
+        int j=0;
+        int y = column - 1 + i;
+        if(y>=0&&y<=7) {
+            while (j<3) {
+                int x= row -1 + j;
+                if (x>=0&&x<=7){
+                    if (minefield[row - 1 + j][y]==2) {
+                        minefield[row][column]=0;
+                        n++;
+                    }
+
+                }
+                j++;
+             }
+       }
+       i++;
+    }
+    if (n==0) {
+       int i1 = 0;
+       while (i1 <3) {
+           int j = 0;
+           int y = column - 1 + i1;
+           if (y>=0&&y<=7) {
+               while (j<3) {
+                   int x= row -1 + j;
+                   if (x>=0&&x<=7) {
+                       minefield[x][y]=0;                      
+                   }
+                   j++;
+               }
+           }
+           i1++;
+        } 
+    }
+       
+}  
+//command is specified by the integer 5 or 6.
+void gameplay_mode(int map[SIZE][SIZE],int way[8][2],int mode){
+    if (mode) {
+        printf("xx\n/\\\n");
+    }
+    else {
+        printf("..\n\\/\n");
+    }
+    int i,j;
+    i=0;
+    printf("   ");
+    while (i<SIZE) {
+        printf(" %02d",i);
+        i++;
+    } 
+    printf("\n   -------------------------\n");
+    i=0;
+    while (i<SIZE) {
+        printf("0%d |",i);
+        j=0;
+        while (j<SIZE) {
+            if (map[i][j]==VISIBLE_SAFE) {
+              if (count(map, way, i, j)) {printf("0%d",count(map, way, i, j));}
+              else {printf("  ");}
+            }
+            else if (map[i][j]==HIDDEN_SAFE) {
+                printf("##");
+            }
+            else {
+                if (mode) {printf("()");}
+                else {printf("##");}
+            }
+            if (j==SIZE-1) {printf("|\n");}
+            else {printf(" ");}
+            j++;
+       }
+       i++;
+    } 
+    printf("   -------------------------\n");  
+} 
+    
+// Set the entire minefield to HIDDEN_SAFE.
+void initialise_field(int minefield[SIZE][SIZE]) {
+    int i = 0;
+    while (i < SIZE) {
+        int j = 0;
+        while (j < SIZE) {           
+            minefield[i][j] = HIDDEN_SAFE;
+            j++;
+        }
+        i++;
+    }
+}
+
+          
+// Print out the actual values of the minefield.
+void print_debug_minefield(int minefield[SIZE][SIZE]) {
+    int i = 0;
+    while (i < SIZE) {
+        int j = 0;
+        while (j < SIZE) {
+            printf("%d ", minefield[i][j]);
+            j++;
+        }
+        printf("\n");
+        i++;
+    }
+}

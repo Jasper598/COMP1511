@@ -1,0 +1,28 @@
+#include <stdio.h>
+#include <math.h>
+int square(int b);
+int power(int b,int c);
+
+int main(void){
+    printf("Enter instruction: ");
+    int a,b,c;
+    while (scanf("%d",&a) !=EOF){
+    if(a==1){
+    scanf("%d",b);
+    printf("%d\n",square(b));
+    }
+    else if(a==2){
+    scanf("%d %d", &b,&c); 
+    printf("%d\n",power(b,c));
+    }
+    printf("Enter instruction: ");
+    }
+ return 0 ;  
+}
+int square(int b){
+      return b*b;
+      }        
+int power(int b,int c){
+    
+         return pow(b,c);}    
+   
